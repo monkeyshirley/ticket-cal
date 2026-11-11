@@ -3,144 +3,122 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F3F4F8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E1018" media="(prefers-color-scheme: dark)">
-<title>二开日历</title>
+<meta name="theme-color" content="#1E1646">
+<title>演出开票监控</title>
 <style>
-/* Layout: one narrow column (max 480px), one step on screen at a time, primary action pinned to the bottom like a native app.
-   No web fonts on purpose: Google Fonts is unreliable in mainland China, so the system CJK stack is the type. */
+/* One narrow column (max 480px). Deep header band carries the name; one step per screen; primary action at the bottom of the flow. */
 :root{
-  --bg:#F3F4F8; --surface:#FFFFFF; --ink:#15182B; --muted:#626780; --line:#DDE0EA;
-  --accent:#2F49E8; --accent-ink:#FFFFFF; --accent-soft:#E6EAFD;
-  --amber:#9A5B00; --amber-soft:#FFF1D9; --ok:#1E7F4F; --ok-soft:#DDF3E7;
+  --bg:#F5F4FA; --surface:#FFFFFF; --ink:#1B1836; --muted:#615C7E; --line:#E4E1F0; --cell:#F0EEF7;
+  --band:#1E1646; --band-sub:#CFC8F5;
+  --accent:#5137D8; --accent-soft:#ECE8FD;
+  --hot:#B01E50; --hot-line:#D42A63; --hot-soft:#FCE4EC;
+  --ok:#1A6E45; --ok-soft:#DDF3E7; --amber:#8A5100; --amber-soft:#FFF1D9;
   --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
-  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
-  --r:14px;
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root{
-  --bg:#0E1018; --surface:#171A26; --ink:#ECEEF6; --muted:#9AA0B8; --line:#2A2E40;
-  --accent:#7D90FF; --accent-ink:#0E1018; --accent-soft:#1E2440;
-  --amber:#F0B44C; --amber-soft:#3A2C10; --ok:#5FD39A; --ok-soft:#123323; color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-text-size-adjust:100%;
-  padding-top:env(safe-area-inset-top,0px)}
-.app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header{padding-block:18px 6px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{font-weight:800;font-size:18px;letter-spacing:.02em}
-.brand small{display:block;font-weight:400;font-size:12px;color:var(--muted);letter-spacing:0}
-.mine-link{font:inherit;font-size:13px;color:var(--accent);background:var(--accent-soft);border:0;border-radius:999px;padding:6px 12px;cursor:pointer}
-.steps{display:flex;gap:6px;margin:10px 0 18px}
-.steps span{flex:1;height:4px;border-radius:2px;background:var(--line)}
-.steps span.on{background:var(--accent)}
-.steps-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:-12px;margin-bottom:16px}
-.steps-label b{color:var(--ink);font-weight:600}
-main{flex:1;display:flex;flex-direction:column;gap:16px;padding-bottom:20px}
-h1{font-size:22px;line-height:1.3;margin:0;text-wrap:balance}
-p.lead{margin:-8px 0 0;color:var(--muted)}
-.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--line);border-radius:10px;padding:3px;gap:3px}
-.seg button{font:inherit;font-size:14px;border:0;border-radius:8px;padding:8px;background:transparent;color:var(--muted);cursor:pointer}
-.seg button.on{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.field{display:flex;flex-direction:column;gap:6px}
-.field label{font-size:13px;color:var(--muted)}
-input,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
-textarea{min-height:84px;resize:vertical}
-input:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.list{display:flex;flex-direction:column;gap:10px}
-.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;font:inherit;color:inherit;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);padding:12px 14px;cursor:pointer}
-.opt.on{border-color:var(--accent);background:var(--accent-soft)}
-.opt .datebox{flex:none;width:48px;text-align:center;border-radius:8px;background:var(--bg);padding:4px 0;font-family:var(--mono);line-height:1.15}
-.opt .datebox b{display:block;font-size:20px}
-.opt .datebox i{font-style:normal;font-size:11px;color:var(--muted)}
-.opt .t{min-width:0}
-.opt .t b{display:block;font-weight:650}
-.opt .t span{font-size:13px;color:var(--muted)}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-text-size-adjust:100%}
+.app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+.band{background:var(--band);color:#fff;display:flex;align-items:center;gap:12px;
+  padding:calc(22px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) 20px max(20px,env(safe-area-inset-left,0px))}
+.band .logo{width:46px;height:46px;border-radius:13px;background:var(--accent);display:grid;place-items:center;flex:none}
+.band .name{font-size:26px;font-weight:800;letter-spacing:.02em;line-height:1.2}
+.band .sub{font-size:12px;color:var(--band-sub)}
+.band .grow{flex:1;min-width:0}
+main{flex:1;display:flex;flex-direction:column;gap:14px;
+  padding:18px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.steps{display:flex;flex-direction:column;gap:6px}
+.steps .bars{display:flex;gap:6px}
+.steps .bars i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.steps .bars i.on{background:var(--accent)}
+.steps .labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.steps .labels b{color:var(--accent);font-weight:700}
+h1{margin:0;font-size:22px;line-height:1.3;text-wrap:balance}
+h2{margin:0;font-size:20px;line-height:1.3}
+p{margin:0}
+.lead{color:var(--muted)}
+.hint{font-size:12px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.hot{border:1.5px solid var(--hot-line)}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.label{font-size:14px;font-weight:600}
+.req{font-size:12px;font-weight:600;color:var(--hot)}
+input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-width:0;height:48px;-webkit-appearance:none;appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23615C7E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:34px}
+input:focus,select:focus{outline:none;border:1.5px solid var(--accent)}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
-.chip.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
-.hint{font-size:13px;color:var(--muted)}
-.empty{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:14px;text-align:center}
-.parsed{font-size:13px;border-radius:10px;padding:9px 12px;background:var(--ok-soft);color:var(--ok)}
-.parsed.bad{background:var(--amber-soft);color:var(--amber)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-/* the ticket: the one object on the page that earns a card treatment */
-.ticket{position:relative;background:var(--surface);border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
-.ticket .top{padding:16px 16px 14px}
-.ticket .plat{font-size:12px;color:var(--muted);letter-spacing:.06em}
-.ticket h2{font-size:19px;margin:4px 0 2px;line-height:1.3}
-.ticket .where{font-size:13px;color:var(--muted)}
-.ticket .perf{position:relative;height:0;border-top:2px dashed var(--line);margin:0 14px}
-.ticket .perf::before,.ticket .perf::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg);border:1px solid var(--line)}
-.ticket .perf::before{left:-25px}.ticket .perf::after{right:-25px}
-.ticket .stub{padding:12px 16px 16px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
-.ticket .stub dt{color:var(--muted)}
-.ticket .stub dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
-.ticket .stub dd.txt{font-family:var(--sans)}
-.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--amber-soft);color:var(--amber)}
-.cal{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
-.cal .e{display:grid;grid-template-columns:60px 1fr;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
-.cal .e:first-child{border-top:0}
-.cal .when{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.3;padding-top:2px}
-.cal .e b{display:block;font-weight:600;font-size:14px}
-.cal .e span{font-size:13px;color:var(--muted)}
-.cal .e.key b{color:var(--accent)}
-.bells{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.bells i{font-style:normal;font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:5px;background:var(--accent-soft);color:var(--accent)}
-.sectitle{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin:4px 0 -6px}
-.big{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;font:inherit;font-size:17px;font-weight:700;color:var(--accent-ink);background:var(--accent);border:0;border-radius:12px;padding:15px;width:100%;cursor:pointer}
-.ghost{font:inherit;font-size:15px;color:var(--accent);background:transparent;border:1.5px solid var(--accent);border-radius:12px;padding:12px;width:100%;cursor:pointer}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px}
-.panel ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
-.panel code{font-family:var(--mono);font-size:12px;word-break:break-all;background:var(--bg);padding:2px 5px;border-radius:5px}
-.warn{background:var(--amber-soft);color:var(--amber);border-radius:var(--r);padding:14px 16px;font-size:14px}
-.warn b{display:block;font-size:16px;margin-bottom:4px}
-.pointer{position:fixed;top:calc(6px + env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));font-size:28px;color:var(--amber);animation:nudge 1.2s ease-in-out infinite}
-@keyframes nudge{50%{transform:translate(4px,-4px)}}
-details{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
-details summary{cursor:pointer;font-size:14px;color:var(--muted)}
-details[open] summary{margin-bottom:10px}
-details ol{margin:0;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.chip{font:inherit;font-size:14px;font-weight:700;min-height:44px;padding:0 20px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.chip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font:inherit;font-size:17px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:14px;padding:15px;width:100%;cursor:pointer}
+.btn[disabled]{opacity:.4;cursor:default}
+.btn2{font:inherit;font-size:15px;min-height:52px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 16px;cursor:pointer}
+.btn2.quiet{color:var(--muted)}
+.actions{margin-top:auto;display:flex;gap:10px;padding-top:6px}
+.actions .btn,.actions .grow{flex:1}
+.note{border-radius:12px;padding:10px 14px;font-size:13px}
+.note.ok{background:var(--ok-soft);color:var(--ok);display:flex;align-items:center;gap:8px}
+.note.amber{background:var(--amber-soft);color:var(--amber)}
+.note.amber b{display:block;font-size:16px;margin-bottom:2px}
+.note.hot{background:var(--hot-soft);color:var(--hot);font-size:14px}
+.note.hot span{display:block;font-size:12px}
+.result{padding:0;gap:0}
+.result .top{padding:16px 16px 14px;display:flex;flex-direction:column;gap:4px}
+.result .tag{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.06em}
+.result .where{font-size:13px;color:var(--muted)}
+.result .perf{border-top:2px dashed var(--line);margin:0 14px}
+.result .src{padding:12px 16px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px}
+.result .src span{display:block;font-size:12px;color:var(--muted)}
+.badge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;background:var(--ok-soft);color:var(--ok)}
+.badge.amber{background:var(--amber-soft);color:var(--amber)}
+.rounds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rounds div{border-radius:10px;background:var(--cell);color:var(--muted);padding:7px 10px;display:flex;flex-direction:column;min-width:0}
+.rounds div span{font-size:12px}
+.rounds div b{font-size:13px}
+.rounds div small{font-size:11px}
+.rounds div.watch{background:var(--accent-soft);color:var(--accent)}
+.rounds div.set{background:var(--hot-soft);color:var(--hot)}
+.fold{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
+.fold summary{list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:48px;font-size:14px;color:var(--muted);cursor:pointer}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-right:4px}
+.fold[open] summary::after{transform:rotate(-135deg)}
+.fold .in{padding:0 0 14px;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.fold ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .copyrow{display:flex;gap:8px;align-items:center}
-.copyrow input{font-family:var(--mono);font-size:12px;padding:9px 10px}
-.copyrow button{flex:none;font:inherit;font-size:14px;border:0;border-radius:8px;background:var(--accent-soft);color:var(--accent);padding:9px 12px;cursor:pointer}
-.done{text-align:center;padding:12px 0 4px}
-.done .mark{width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;background:var(--ok-soft);color:var(--ok);font-size:32px;font-weight:700}
-.mine{display:flex;flex-direction:column;gap:8px}
-.mine .m{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-.mine .m .t{flex:1;min-width:0}
-.mine .m b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mine .m span{font-size:12px;color:var(--muted)}
-.mine .m button{font:inherit;font-size:12px;color:var(--muted);background:none;border:0;padding:6px;cursor:pointer}
-.status{font-size:12px;font-weight:600;color:var(--amber)}
-.status.ok{color:var(--ok)}
-.bar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(to top,var(--bg) 70%,transparent);
-  padding:18px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.bar .in{max-width:448px;margin:0 auto;display:flex;gap:10px}
-.bar .back{flex:none;font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:0 16px;cursor:pointer}
-.bar .big[disabled]{opacity:.4;cursor:default}
-footer{font-size:12px;color:var(--muted);padding:8px 0 calc(110px + env(safe-area-inset-bottom,0px));line-height:1.6}
-.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font-size:14px;padding:9px 14px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.copyrow input{font-size:12px;height:44px;padding:0 10px}
+.copyrow button{flex:none;font:inherit;font-size:14px;font-weight:600;min-height:44px;border:0;border-radius:10px;background:var(--accent-soft);color:var(--accent);padding:0 14px;cursor:pointer}
+.status{display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:12px;padding:4px 6px 4px 14px;font-size:13px;min-height:52px}
+.status.ok{background:var(--ok-soft);color:var(--ok)}
+.status.amber{background:var(--amber-soft);color:var(--amber)}
+.status button{font:inherit;font-size:13px;font-weight:600;min-height:44px;border:0;background:none;color:inherit;text-decoration:underline;padding:0 8px;cursor:pointer;white-space:nowrap}
+.listhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.listhead h1{font-size:20px}
+.show .t b{display:block;font-size:16px}
+.show .t span{font-size:12px;color:var(--muted)}
+.show .foot{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.show .foot button{font:inherit;font-size:12px;min-height:44px;margin:-12px 0;border:0;background:none;color:var(--muted);padding:0 4px;cursor:pointer}
+.show.done{opacity:.75}
+.empty{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:22px 16px;text-align:center}
+footer{font-size:12px;color:var(--muted);line-height:1.6;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;padding:9px 14px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 [hidden]{display:none!important}
-@media (prefers-reduced-motion:reduce){.pointer{animation:none}.toast{transition:none}}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <div class="brand">二开日历<small>开票时间一确定，自动出现在你的日历里</small></div>
-    <button class="mine-link" id="btn-mine" hidden>我的场次</button>
-  </header>
-  <div id="progress">
-    <div class="steps"><span></span><span></span><span></span></div>
-    <div class="steps-label"><span>录入场次</span><span>确认</span><span>加入日历</span></div>
+  <div class="band">
+    <div class="logo"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 11v2"/><path d="M13 17v2"/></svg></div>
+    <div class="grow"><div class="name">演出开票监控</div><div class="sub">官方一公布开票时间，就写进你的日历并提前提醒</div></div>
+    <svg id="arrow" hidden aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFD27A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M7 17 17 7"/><path d="M9 7h8v8"/></svg>
   </div>
   <main id="view"></main>
-  <footer>原型说明：演出数据为示例；场次只保存在这台手机的浏览器里；所有测试者订阅的是同一份日历，目前只同步重庆草莓音乐节。正式版每人一个专属日历地址。</footer>
+  <footer>原型说明：目前只接入了「重庆草莓音乐节」的真实监控，其他演出可以走完流程，但不会真的被监控。演出列表只保存在这台手机的浏览器里。</footer>
 </div>
-<div class="bar" id="bar"><div class="in" id="bar-in"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -148,268 +126,235 @@ footer{font-size:12px;color:var(--muted);padding:8px 0 calc(110px + env(safe-are
   var CAL_HTTPS = 'https://monkeyshirley.github.io/ticket-cal/cal.ics';
   var CAL_WEBCAL = 'webcal://monkeyshirley.github.io/ticket-cal/cal.ics';
   var PAGE_URL = 'https://monkeyshirley.github.io/ticket-cal/';
-  var WD = ['周日','周一','周二','周三','周四','周五','周六'];
-
-  // Example show library (prototype). Real version: maintained in the backend.
-  var LIB = [
-    {id:'cq-strawberry-2026', name:'2026重庆草莓音乐节', city:'重庆', venue:'重庆国际博览中心 北室外展场', platform:'大麦 · 猫眼 · 正在现场',
-      firstSale:'2026-11-03T13:00', status:'首开已售罄',
-      sessions:[{id:'d1', date:'2026-11-28', label:'DAY1', note:'摇滚民谣场'},{id:'d2', date:'2026-11-29', label:'DAY2', note:'港乐与华语流行'}]},
-    {id:'cq-jackson-2026', name:'王嘉尔 MAGICMAN 2 巡回演唱会 重庆站', city:'重庆', venue:'华熙生物 · 润百颜ECM中心', platform:'大麦',
-      firstSale:null, status:'开票信息待确认',
-      sessions:[{id:'s1', date:'2026-11-28', label:'', note:''}]}
-  ];
-  var KINDS = ['二开','回流票','加场'];
+  var CITIES = ['北京','上海','广州','深圳','成都','重庆','杭州','南京','武汉','西安','长沙','天津','苏州','郑州','青岛','厦门','福州','合肥','济南','沈阳','大连','哈尔滨','长春','昆明','贵阳','南宁','海口','三亚','南昌','太原','石家庄','宁波','佛山','泉州','香港','澳门'];
+  var ROUNDS = ['首开','二开','三开'];
+  // Prototype stand-in for the backend's recognition. Only this show is really monitored.
+  var KNOWN = [{
+    id:'cq-strawberry-2026', test:function(n){return /草莓/.test(n)}, city:'重庆', from:'2026-11-28', to:'2026-11-29',
+    full:'2026重庆草莓音乐节', dates:'11月28日 – 29日', venue:'重庆国际博览中心 北室外展场', source:'摩登天空官方微博',
+    done:{'首开':'11月3日 13:00'}, match:/重庆草莓/
+  }];
 
   var $ = function(s){return document.querySelector(s)};
-  var view = $('#view'), barIn = $('#bar-in');
-  var S = {step:1, mode:'search', q:'', pick:null, session:null, kinds:KINDS.slice(), paste:'', parsed:null, manual:{name:'',city:'',date:'',firstSale:''}, draft:null};
-
+  var view = $('#view');
   function load(k, d){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
   function save(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-  var mine = load('ec.mine', []);
-  var subscribed = load('ec.subscribed', false);
-
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]}); }
-  function d(iso){ var p = iso.slice(0,10).split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
-  function md(iso){ var x = d(iso); return (x.getMonth()+1)+'月'+x.getDate()+'日'; }
-  function wd(iso){ return WD[d(iso).getDay()]; }
-  function hm(iso){ return iso.length > 10 ? iso.slice(11,16) : ''; }
-  function addDays(x, n){ var y = new Date(x); y.setDate(y.getDate()+n); return y; }
-  function fmtD(x){ return (x.getMonth()+1)+'月'+x.getDate()+'日'; }
-  function dot(x){ return (x.getMonth()+1)+'.'+x.getDate(); }
+  function md(iso){ var p = iso.split('-'); return (+p[1])+'月'+(+p[2])+'日'; }
+  function today(){ var d = new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
   function toast(m){ var t = $('#toast'); t.textContent = m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show')}, 1800); }
 
   var ua = navigator.userAgent || '';
-  var ENV = /MicroMessenger/i.test(ua) ? 'wechat'
-          : /xhsdiscover|XiaoHongShu|discover\//i.test(ua) ? 'xhs'
+  var ENV = /MicroMessenger/i.test(ua) ? 'wechat' : /xhsdiscover|XiaoHongShu|discover\//i.test(ua) ? 'xhs'
           : /Weibo|QQ\/|DingTalk|AlipayClient|Claude/i.test(ua) ? 'inapp'
-          : /iPhone|iPad|iPod/i.test(ua) ? 'ios'
-          : /Android/i.test(ua) ? 'android' : 'desktop';
-  var APPNAME = {wechat:'微信', xhs:'小红书', inapp:'当前 App'}[ENV];
+          : /iPhone|iPad|iPod/i.test(ua) ? 'ios' : /Android/i.test(ua) ? 'android' : 'desktop';
+  var INAPP = ENV === 'wechat' || ENV === 'xhs' || ENV === 'inapp';
 
-  // ---------- link parsing ----------
-  function parseLink(text){
-    var m = String(text).match(/https?:\/\/[^\s"'<>，。]+/i);
-    if(!m) return null;
-    var url = m[0], host = '';
-    try{ host = new URL(url).hostname; }catch(e){ return {ok:false, url:url}; }
-    var plat = /damai|tb\.cn/i.test(host) ? '大麦' : /maoyan/i.test(host) ? '猫眼' : /showstart/i.test(host) ? '秀动' : /piaoxingqiu|pxq/i.test(host) ? '票星球' : /zhengzai|modernsky/i.test(host) ? '正在现场' : null;
-    var id = (url.match(/[?&](?:itemId|id|showId)=(\d{5,})/i) || url.match(/\/(?:detail|item|shows?)\/(\d{5,})/i) || url.match(/(\d{8,})/) || [])[1] || null;
-    return {ok:!!plat, url:url, platform:plat, id:id};
-  }
+  var mine = load('kp.mine', []);
+  var subscribed = load('kp.subscribed', false);
+  var events = [];
+  var S = {step: 1, form: {name:'', city:'', date:'', rounds: ROUNDS.slice()}, draft: null, fromHome: false};
 
-  // ---------- estimate ----------
-  function windowFor(firstSale, showDate){
-    if(!firstSale) return null;
-    var a = addDays(d(firstSale), 7), b = addDays(d(firstSale), 21), last = addDays(d(showDate), -2);
-    if(b > last) b = last;
-    var today = new Date(); today.setHours(0,0,0,0);
-    if(a < today) a = today;
-    if(b < a) return null;
-    return {from:a, to:b};
+  function recognise(f){
+    for(var i=0;i<KNOWN.length;i++){ var k = KNOWN[i];
+      if(k.test(f.name) && k.city === f.city && f.date >= k.from && f.date <= k.to){
+        return {key:k.id, known:k.id, name:k.full, dates:k.dates, city:k.city, venue:k.venue, source:k.source, date:k.to, rounds:f.rounds.slice()};
+      } }
+    return {key:'u-'+f.name+'-'+f.city+'-'+f.date, known:null, name:f.name, dates:md(f.date), city:f.city, venue:'', source:'', date:f.date, rounds:f.rounds.slice()};
   }
-
-  // ---------- render ----------
-  function setProgress(n){
-    $('#progress').hidden = (n === 0);
-    var bars = document.querySelectorAll('.steps span');
-    for(var i=0;i<bars.length;i++) bars[i].classList.toggle('on', i < n);
-    var labels = document.querySelectorAll('.steps-label span');
-    for(var j=0;j<labels.length;j++) labels[j].innerHTML = (j === n-1) ? '<b>'+labels[j].textContent+'</b>' : labels[j].textContent;
+  function knownOf(x){ for(var i=0;i<KNOWN.length;i++) if(KNOWN[i].id === x.known) return KNOWN[i]; return null; }
+  function saleFor(x, round){
+    var k = knownOf(x); if(!k) return null;
+    for(var i=0;i<events.length;i++){ var e = events[i];
+      if(e.type === 'sale' && k.match.test(e.show||'') && (e.title||'').indexOf('【'+round+'】') > -1) return e; }
+    return null;
   }
-  function setBar(html){ barIn.innerHTML = html; $('#bar').hidden = !html; }
-  function mineBtn(){ var b = $('#btn-mine'); b.hidden = !mine.length || S.step === 0; b.textContent = '我的场次 ' + mine.length; }
-
-  function render(){
-    mineBtn();
-    if(S.step === 1) return step1();
-    if(S.step === 2) return step2();
-    if(S.step === 3) return step3();
-    return doneView();
-  }
-
-  function step1(){
-    setProgress(1);
-    var h = '<h1>你想盯哪一场？</h1><p class="lead">选好场次后，二开、回流票、加场的开抢时间会自动进你的日历。</p>'
-      + '<div class="seg" role="tablist"><button id="m-search" class="'+(S.mode==='search'?'on':'')+'">搜索演出</button><button id="m-paste" class="'+(S.mode==='paste'?'on':'')+'">粘贴购票链接</button></div>';
-    if(S.mode === 'search'){
-      var q = S.q.trim();
-      var hits = LIB.filter(function(s){ return !q || (s.name+s.city+s.venue).toLowerCase().indexOf(q.toLowerCase()) > -1; });
-      h += '<div class="field"><label for="q">演出名或城市</label><input id="q" type="search" placeholder="例：草莓 重庆" value="'+esc(S.q)+'" autocomplete="off"></div>';
-      if(!hits.length){
-        h += '<div class="empty">库里还没有这一场。<br>切到「粘贴购票链接」，把大麦或猫眼的分享链接贴进来。</div>';
-      } else {
-        h += '<div class="list">' + hits.map(function(s){
-          var on = S.pick && S.pick.id === s.id;
-          return '<button class="opt'+(on?' on':'')+'" data-pick="'+s.id+'"><div class="datebox"><b>'+d(s.sessions[0].date).getDate()+'</b><i>'+(d(s.sessions[0].date).getMonth()+1)+'月</i></div>'
-            + '<div class="t"><b>'+esc(s.name)+'</b><span>'+esc(s.city)+' · '+esc(s.venue)+'</span></div></button>';
-        }).join('') + '</div>';
-      }
-      if(S.pick && S.pick.sessions.length > 1){
-        h += '<div class="sectitle">选择场次</div><div class="list">' + S.pick.sessions.map(function(se){
-          var on = S.session && S.session.id === se.id;
-          return '<button class="opt'+(on?' on':'')+'" data-sess="'+se.id+'"><div class="datebox"><b>'+d(se.date).getDate()+'</b><i>'+wd(se.date)+'</i></div>'
-            + '<div class="t"><b>'+esc((se.label ? se.label+' · ' : '')+md(se.date))+'</b><span>'+esc(se.note||'')+'</span></div></button>';
-        }).join('') + '</div>';
-      }
-    } else {
-      h += '<div class="field"><label for="paste">在大麦 / 猫眼里点「分享」→「复制链接」，粘贴到这里</label><textarea id="paste" placeholder="https://m.damai.cn/shows/item.html?itemId=…">'+esc(S.paste)+'</textarea></div>';
-      if(S.parsed){
-        h += S.parsed.ok
-          ? '<div class="parsed">已识别：'+esc(S.parsed.platform)+' 项目'+(S.parsed.id ? ' #'+esc(S.parsed.id) : '')+'。请补充下面的信息。</div>'
-          : '<div class="parsed bad">没认出这是哪个平台的链接，可以直接手动填写下面的信息。</div>';
-      }
-      h += '<div class="field"><label for="mn">演出名称</label><input id="mn" value="'+esc(S.manual.name)+'" placeholder="例：五月天 2026 巡回演唱会 成都站"></div>'
-        + '<div class="row2"><div class="field"><label for="mc">城市</label><input id="mc" value="'+esc(S.manual.city)+'" placeholder="成都"></div>'
-        + '<div class="field"><label for="md">演出日期</label><input id="md" type="date" value="'+esc(S.manual.date)+'"></div></div>'
-        + '<div class="field"><label for="mf">首开时间（知道就填，可不填）</label><input id="mf" type="datetime-local" value="'+esc(S.manual.firstSale)+'"></div>';
-    }
-    h += '<div class="sectitle">提醒我</div><div class="chips">' + KINDS.map(function(k){ return '<button class="chip'+(S.kinds.indexOf(k)>-1?' on':'')+'" data-kind="'+k+'">'+k+'</button>'; }).join('') + '</div>';
-    view.innerHTML = h;
-    setBar('<button class="big" id="next1"'+(ready1()?'':' disabled')+'>下一步</button>');
-  }
-  function ready1(){
-    if(!S.kinds.length) return false;
-    if(S.mode === 'search') return !!(S.pick && S.session);
-    return !!(S.manual.name.trim() && S.manual.date);
-  }
-  function buildDraft(){
-    if(S.mode === 'search'){
-      var s = S.pick, se = S.session;
-      return {key:s.id+'-'+se.id, name:s.name, sessionLabel:(se.label ? se.label+' · ' : '')+md(se.date)+' '+wd(se.date), date:se.date,
-        city:s.city, venue:s.venue, platform:s.platform, firstSale:s.firstSale, status:s.status, kinds:S.kinds.slice(), source:'库'};
-    }
-    var m = S.manual;
-    return {key:'manual-'+(S.parsed && S.parsed.id ? S.parsed.id : Date.now().toString(36))+'-'+m.date, name:m.name.trim(), sessionLabel:md(m.date)+' '+wd(m.date), date:m.date,
-      city:m.city.trim(), venue:'', platform:(S.parsed && S.parsed.platform) || '未知平台', firstSale:m.firstSale || null,
-      status:'待核实', kinds:S.kinds.slice(), source:'手动', link:S.parsed ? S.parsed.url : ''};
-  }
-
-  function step2(){
-    setProgress(2);
-    var x = S.draft, w = windowFor(x.firstSale, x.date);
-    var h = '<h1>确认这一场</h1>'
-      + '<div class="ticket"><div class="top"><div class="plat">'+esc(x.platform)+'</div><h2>'+esc(x.name)+'</h2><div class="where">'+esc(x.sessionLabel)+(x.city ? ' · '+esc(x.city) : '')+(x.venue ? ' · '+esc(x.venue) : '')+'</div></div>'
-      + '<div class="perf"></div><dl class="stub">'
-      + '<dt>当前状态</dt><dd class="txt"><span class="badge">'+esc(x.status)+'</span></dd>'
-      + '<dt>首开</dt><dd>'+(x.firstSale ? md(x.firstSale)+' '+hm(x.firstSale) : '<span class="txt">未知</span>')+'</dd>'
-      + '<dt>预计二开<br><small style="font-size:11px">仅供参考，不进日历</small></dt><dd>'+(w ? fmtD(w.from)+' – '+fmtD(w.to) : '<span class="txt">待公告</span>')+'</dd>'
-      + '<dt>提醒类型</dt><dd class="txt">'+esc(x.kinds.join(' · '))+'</dd>'
-      + '</dl></div>'
-      + '<div class="sectitle">会出现在你日历里的</div><div class="cal">'
-      + '<div class="e key"><div class="when">确定后<br>才写入</div><div><b>'+esc(x.kinds[0])+'开抢时间</b><span>后台核实到确切的开抢日期和时刻后才写入，预计和传闻不会进日历。</span><div class="bells"><i>提前 1 天</i><i>提前 1 小时</i><i>提前 10 分钟</i></div></div></div>'
-      + '</div>'
-      + (x.source === '手动' ? '<p class="hint">这一场不在库里，提交后我们会先核实场次信息，再开始监控。</p>' : '');
-    view.innerHTML = h;
-    setBar('<button class="back" id="back">返回</button><button class="big" id="next2">'+(subscribed ? '加入我的日历' : '下一步：加入日历')+'</button>');
-  }
-
-  // In-app browsers (WeChat, 小红书) don't share storage with Safari, so the chosen show rides along in the URL.
-  function draftUrl(){ return PAGE_URL + '#d=' + encodeURIComponent(JSON.stringify(S.draft)); }
-  function step3(){
-    setProgress(3);
-    try{ history.replaceState(null, '', '#d=' + encodeURIComponent(JSON.stringify(S.draft))); }catch(e){}
-    var h = '<h1>授权加入日历</h1><p class="lead">只需要做一次。以后再添加场次，会自动出现在同一个日历里。</p>';
-    if(ENV === 'wechat' || ENV === 'xhs' || ENV === 'inapp'){
-      h += '<div class="pointer" aria-hidden="true">↗</div>'
-        + '<div class="warn"><b>请先在 Safari 中打开</b>'+esc(APPNAME)+'里无法添加日历。点右上角「···」，选「在 Safari 中打开」（安卓选「在浏览器打开」），回到这一步继续。</div>'
-        + '<p class="hint">「在 Safari 中打开」后会直接回到这一步，选好的场次会带过去。也可以复制下面的地址，粘贴到 Safari。</p>'
-        + '<div class="copyrow"><input readonly value="'+esc(draftUrl())+'" id="pageurl" aria-label="本页地址"><button data-copy="pageurl">复制</button></div>';
-      setBar('<button class="back" id="back">返回</button>');
-    } else if(ENV === 'ios'){
-      h += '<a class="big" id="sub" href="'+CAL_WEBCAL+'">订阅到 iPhone 日历</a>'
-        + '<div class="panel"><ol><li>点上面的按钮，系统会弹出「订阅此日历？」</li><li>点「订阅」，再点右上角「完成」</li><li>回到这里，点下方「我已订阅」</li></ol></div>'
-        + manualIOS();
-      setBar('<button class="back" id="back">返回</button><button class="big" id="confirm-sub">我已订阅</button>');
-    } else if(ENV === 'android'){
-      h += '<div class="warn"><b>安卓暂不支持一键订阅</b>复制下面的地址，在系统「日历」app 里找「添加日历订阅」「订阅日历」或「导入 URL」。不同品牌位置不同，找不到可以告诉我们你的手机型号。</div>'
-        + '<div class="copyrow"><input readonly value="'+CAL_HTTPS+'" id="calurl" aria-label="日历地址"><button data-copy="calurl">复制</button></div>';
-      setBar('<button class="back" id="back">返回</button><button class="big" id="confirm-sub">我已添加</button>');
-    } else {
-      h += '<div class="warn"><b>请用手机打开这一页</b>日历提醒要加到你随身带的手机上。用手机浏览器访问下面的地址，选好场次后在这一步订阅。</div>'
-        + '<div class="copyrow"><input readonly value="'+PAGE_URL+'" id="pageurl" aria-label="本页地址"><button data-copy="pageurl">复制</button></div>'
-        + '<details><summary>一定要在电脑上订阅？</summary><div class="copyrow"><input readonly value="'+CAL_HTTPS+'" id="calurl" aria-label="日历地址"><button data-copy="calurl">复制</button></div><p class="hint">Mac：日历 → 文件 → 新建日历订阅，粘贴地址。</p></details>';
-      setBar('<button class="back" id="back">返回</button><button class="big" id="confirm-sub">我已订阅</button>');
-    }
-    view.innerHTML = h;
-  }
-  function manualIOS(){
-    return '<details><summary>按钮没反应？手动添加</summary><ol>'
-      + '<li>打开「设置」→「App」→「日历」（旧版 iOS 直接进「日历」）</li>'
-      + '<li>「日历账户」→「添加账户」→「其他」→「添加已订阅的日历」</li>'
-      + '<li>服务器一栏粘贴下面的地址，「下一步」→「存储」</li></ol>'
-      + '<div class="copyrow" style="margin-top:10px"><input readonly value="'+CAL_HTTPS+'" id="calurl" aria-label="日历地址"><button data-copy="calurl">复制</button></div></details>';
-  }
-
-  function doneView(){
-    setProgress(0);
-    var h = '<div class="done"><div class="mark">✓</div><h1>已加入你的日历</h1><p class="lead" style="margin-top:6px">现在日历里是空的，这是正常的。开抢时间一确定，日历才会出现事件，并提前 1 天、1 小时、10 分钟提醒你。</p></div>'
-      + '<div class="sectitle">我的场次</div>' + mineList()
-      + '<details><summary>日历里没看到？</summary><ol><li>打开「日历」app，点底部「日历」，确认「演出开票提醒」已勾选</li><li>订阅日历一般每小时刷新一次，刚添加的场次可能要等一会儿</li></ol></details>';
-    view.innerHTML = h;
-    setBar('<button class="big" id="again">再添加一场</button>');
-  }
-  function mineList(){
-    if(!mine.length) return '<div class="empty">还没有场次</div>';
-    return '<div class="mine">' + mine.map(function(x, i){
-      return '<div class="m"><div class="t"><b>'+esc(x.name)+'</b><span>'+esc(x.sessionLabel)+' · '+esc(x.kinds.join('/'))+'</span><div class="status'+(x.source==='库'?' ok':'')+'">'+(x.source==='库' ? '监控中' : '待核实')+'</div></div><button data-del="'+i+'" aria-label="移除">移除</button></div>';
+  function fmtSale(e){ var p = e.start.split('T'); return md(p[0])+' '+p[1]; }
+  function roundCells(x, detail){
+    var k = knownOf(x), firstOpen = true;
+    return '<div class="rounds">' + ROUNDS.map(function(r){
+      var cls = '', st = '', sub = '';
+      var sale = saleFor(x, r);
+      if(x.rounds.indexOf(r) < 0){ st = '不提醒'; }
+      else if(sale){ cls = 'set'; st = '已确定'; sub = fmtSale(sale); }
+      else if(k && k.done[r]){ st = '已结束'; sub = k.done[r]; }
+      else if(k){ cls = 'watch'; st = '监控中'; sub = '待官方公布'; }
+      else if(firstOpen){ cls = 'watch'; st = '监控中'; sub = '待公布'; firstOpen = false; }
+      else { st = '未到'; }
+      return '<div class="'+cls+'"><span>'+r+'</span><b>'+st+'</b>'+(detail && sub ? '<small>'+esc(sub)+'</small>' : '')+'</div>';
     }).join('') + '</div>';
   }
 
-  function commit(){
-    var x = S.draft;
-    if(!mine.some(function(m){ return m.key === x.key; })){ x.addedAt = new Date().toISOString(); mine.push(x); save('ec.mine', mine); }
-    S.step = 4; reset(); save('ec.draft', null);
-    try{ history.replaceState(null, '', location.pathname); }catch(e){}
-    render(); scrollTo(0,0);
+  function steps(n){
+    var l = ['1 填写演出','2 确认','3 订阅日历'];
+    return '<div class="steps"><div class="bars">'+[1,2,3].map(function(i){return '<i class="'+(i<=n?'on':'')+'"></i>'}).join('')+'</div><div class="labels">'
+      + l.map(function(t,i){ return i === n-1 ? '<b>'+t+'</b>' : '<span>'+t+'</span>'; }).join('') + '</div></div>';
   }
-  function reset(){ S.mode='search'; S.q=''; S.pick=null; S.session=null; S.kinds=KINDS.slice(); S.paste=''; S.parsed=null; S.manual={name:'',city:'',date:'',firstSale:''}; }
-  function go(n){ S.step = n; render(); scrollTo(0,0); save('ec.draft', {step:S.step, draft:S.draft}); }
+  function render(){
+    $('#arrow').hidden = !(S.step === 3 && INAPP);
+    if(S.step === 1) return step1();
+    if(S.step === 2) return step2();
+    if(S.step === 3) return step3();
+    return home();
+  }
+  function go(n){ S.step = n; render(); scrollTo(0,0); }
 
-  // ---------- events ----------
-  document.addEventListener('click', function(e){
-    var t = e.target.closest('button, a'); if(!t) return;
-    if(t.id === 'm-search' || t.id === 'm-paste'){ S.mode = t.id === 'm-search' ? 'search' : 'paste'; render(); return; }
-    if(t.dataset.pick){ var s = LIB.filter(function(x){return x.id===t.dataset.pick})[0]; S.pick = s; S.session = s.sessions.length === 1 ? s.sessions[0] : null; render(); return; }
-    if(t.dataset.sess){ S.session = S.pick.sessions.filter(function(x){return x.id===t.dataset.sess})[0]; render(); return; }
-    if(t.dataset.kind){ var k = t.dataset.kind, i = S.kinds.indexOf(k); if(i>-1) S.kinds.splice(i,1); else S.kinds.push(k); render(); return; }
-    if(t.dataset.copy){ copy(t.dataset.copy); return; }
-    if(t.dataset.del){ mine.splice(+t.dataset.del, 1); save('ec.mine', mine); render(); return; }
-    if(t.id === 'next1' && ready1()){ S.draft = buildDraft(); go(2); return; }
-    if(t.id === 'next2'){ if(subscribed){ commit(); } else { go(3); } return; }
-    if(t.id === 'back'){ go(S.step - 1); return; }
-    if(t.id === 'sub'){ save('ec.tapped', true); return; }
-    if(t.id === 'confirm-sub'){ subscribed = true; save('ec.subscribed', true); commit(); return; }
-    if(t.id === 'again'){ S.step = 1; S.draft = null; render(); scrollTo(0,0); return; }
-    if(t.id === 'btn-mine'){ S.step = 4; render(); scrollTo(0,0); return; }
-  });
-  document.addEventListener('input', function(e){
-    var t = e.target;
-    if(t.id === 'q'){ S.q = t.value; var pos = t.selectionStart; render(); var q = $('#q'); q.focus(); try{ q.setSelectionRange(pos,pos); }catch(_){} return; }
-    if(t.id === 'paste'){ S.paste = t.value; var p = parseLink(t.value); var changed = JSON.stringify(p) !== JSON.stringify(S.parsed); S.parsed = p;
-      if(changed){ var v = t.value; render(); var ta = $('#paste'); ta.focus(); ta.setSelectionRange(v.length, v.length); } else { syncBar(); } return; }
-    if(t.id === 'mn'){ S.manual.name = t.value; syncBar(); }
-    if(t.id === 'mc'){ S.manual.city = t.value; syncBar(); }
-    if(t.id === 'md'){ S.manual.date = t.value; syncBar(); }
-    if(t.id === 'mf'){ S.manual.firstSale = t.value; syncBar(); }
-  });
-  function syncBar(){ var b = $('#next1'); if(b) b.disabled = !ready1(); }
+  function step1(){
+    var f = S.form;
+    view.innerHTML = steps(1)
+      + '<h1>请添加要监控的演出</h1>'
+      + '<div class="card">'
+      +   '<div class="field"><label for="name">演出名称 <span class="req">必填</span></label><input id="name" autocomplete="off" placeholder="如：草莓音乐节" value="'+esc(f.name)+'">'
+      +   '<div class="hint">填艺人或音乐节的官方全称，例如「王嘉尔」「草莓音乐节」。不要写简称或粉丝叫法。</div></div>'
+      +   '<div class="row2"><div class="field"><label for="city">城市 <span class="req">必填</span></label><select id="city"><option value="">请选择</option>'
+      +     CITIES.map(function(c){return '<option'+(c===f.city?' selected':'')+'>'+c+'</option>'}).join('') + '</select></div>'
+      +   '<div class="field"><label for="date">演出日期 <span class="req">必填</span></label><input id="date" type="date" min="'+today()+'" value="'+esc(f.date)+'"></div></div>'
+      +   '<div class="hint" style="margin-top:-4px">城市从列表里选；连续多天的演出选第一天。</div>'
+      + '</div>'
+      + '<div class="card"><div class="label">提醒哪几轮开票</div><div class="chips">'
+      +   ROUNDS.map(function(r){return '<button class="chip'+(f.rounds.indexOf(r)>-1?' on':'')+'" data-round="'+r+'" aria-pressed="'+(f.rounds.indexOf(r)>-1)+'">'+r+'</button>'}).join('')
+      + '</div><div class="hint">只提醒官方提前公布的开票时间。回流票没有公告，不在提醒范围内。</div></div>'
+      + '<div class="actions">'+(mine.length ? '<button class="btn2" id="to-home">返回</button>' : '')+'<button class="btn" id="next1"'+(ready1()?'':' disabled')+'>识别这场演出</button></div>';
+  }
+  function ready1(){ var f = S.form; return !!(f.name.trim().length >= 2 && f.city && f.date && f.rounds.length); }
+
+  function step2(){
+    var x = S.draft, dup = mine.some(function(m){return m.key === x.key});
+    var h = steps(2);
+    if(x.known){
+      h += '<div><h1>是这一场吗？</h1><p class="lead">这是根据你填的信息识别出的演出，请核对。</p></div>'
+        + '<div class="card result"><div class="top"><div class="tag">识别结果</div><h2>'+esc(x.name)+'</h2><div class="where">'+esc(x.dates)+' · '+esc(x.city)+' · '+esc(x.venue)+'</div></div>'
+        + '<div class="perf"></div><div class="src"><div><span>开票公告信源</span><b>'+esc(x.source)+'</b></div><span class="badge">官方信源</span></div></div>';
+    } else {
+      h += '<div><h1>请核对你填的信息</h1><p class="lead">这一场没有自动识别到对应的演出。</p></div>'
+        + '<div class="card result"><div class="top"><div class="tag">你填写的</div><h2>'+esc(x.name)+'</h2><div class="where">'+esc(x.dates)+' · '+esc(x.city)+'</div></div>'
+        + '<div class="perf"></div><div class="src"><div><span>开票公告信源</span><b>未找到</b></div><span class="badge amber">尚未接入</span></div></div>'
+        + '<div class="note amber">原型阶段只接入了「重庆草莓音乐节」。这一场可以加进列表走完流程，但目前不会真的被监控。</div>';
+    }
+    h += '<div class="card"><div class="label">开票进度</div>'+roundCells(x, true)
+      + '<div class="hint">开抢时间确定后才会写进日历，并提前 1 天、1 小时、10 分钟提醒。预计和传闻不会进日历。</div></div>'
+      + (dup ? '<div class="note amber">这一场已经在你的监控列表里了。</div>' : '')
+      + '<div class="actions"><button class="btn2" id="back1">'+(x.known ? '不是这场' : '返回修改')+'</button><button class="btn" id="confirm"'+(dup?' disabled':'')+'>'+(x.known ? '是这场，开始监控' : '加入列表')+'</button></div>';
+    view.innerHTML = h;
+  }
+
+  function manual(){
+    return '<details class="fold"><summary>按钮没反应？查看手动添加方法</summary><div class="in"><ol>'
+      + '<li>打开「设置」→「App」→「日历」（旧版 iOS 直接进「日历」）</li>'
+      + '<li>「日历账户」→「添加账户」→「其他」→「添加已订阅的日历」</li>'
+      + '<li>粘贴下面的地址，「下一步」→「存储」</li></ol>'
+      + '<div class="copyrow"><input readonly id="calurl" aria-label="日历地址" value="'+CAL_HTTPS+'"><button data-copy="calurl">复制</button></div>'
+      + '<button class="btn2" id="manual-done">我已手动添加</button></div></details>';
+  }
+  function step3(){
+    var x = S.draft || mine[mine.length-1];
+    var h = (S.fromHome ? '' : steps(3));
+    if(x && !S.fromHome) h += '<div class="note ok"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M5 12.5 10 17.5 19 7"/></svg><b>'+esc(x.name)+' '+(x.known ? '已开始监控' : '已加入列表')+'</b></div>';
+    var lead = '只在第一次添加演出时做一次。之后发现的开票时间会自动写进日历，再添加别的演出也不用重新授权。';
+    if(INAPP){
+      var url = PAGE_URL + (x ? '#add=' + encodeURIComponent(JSON.stringify(x)) : '');
+      h += '<div><h1>订阅日历，接收提醒</h1><p class="lead">只在第一次添加演出时做一次。之后发现的开票时间会自动写进日历。</p></div>'
+        + '<div class="note amber"><b>请先在 Safari 中打开</b>微信和小红书里无法添加日历。点右上角「···」，选「在 Safari 中打开」，回到这一步继续。</div>'
+        + '<p class="hint" style="font-size:13px">打开后会直接回到这一步，刚才填的演出会带过去。也可以复制下面的地址，粘贴到 Safari。</p>'
+        + '<div class="copyrow"><input readonly id="pageurl" aria-label="本页地址" value="'+esc(url)+'"><button data-copy="pageurl">复制</button></div>'
+        + '<div class="actions"><button class="btn2 quiet grow" id="skip">先跳过，稍后再订阅</button></div>';
+    } else if(ENV === 'ios'){
+      h += '<div><h1>最后一步：订阅日历</h1><p class="lead">'+lead+'</p></div>'
+        + '<div class="card"><div><b>点击后会跳到「日历」</b>，点「订阅」，再点右上角「完成」就可以了。<b style="color:var(--accent)">不需要再回到这个页面。</b></div>'
+        + '<a class="btn" id="sub" href="'+CAL_WEBCAL+'">订阅到 iPhone 日历</a>'
+        + '<div class="hint">日历名称是「演出开票监控」。刚订阅时里面是空的，属于正常情况，开票时间确定后才会出现。下次打开本页，顶部会自动显示「日历已订阅」。</div></div>'
+        + manual()
+        + '<div class="actions"><button class="btn2 quiet grow" id="skip">先跳过，稍后再订阅</button></div>';
+    } else {
+      h += '<div><h1>最后一步：订阅日历</h1><p class="lead">'+lead+'</p></div>'
+        + '<div class="note amber"><b>目前只支持 iPhone</b>'+(ENV === 'android' ? '安卓手机的日历订阅还没有验证，暂时无法提醒。演出已保存在列表里。' : '日历提醒要加到随身带的手机上，请用 iPhone 的 Safari 打开本页再订阅。')+'</div>'
+        + '<div class="copyrow"><input readonly id="pageurl" aria-label="本页地址" value="'+PAGE_URL+'"><button data-copy="pageurl">复制</button></div>'
+        + '<div class="actions"><button class="btn2 quiet grow" id="skip">先跳过</button></div>';
+    }
+    view.innerHTML = h;
+  }
+
+  function showCard(x, i, ended){
+    var k = knownOf(x), sale = null, saleRound = '';
+    ROUNDS.forEach(function(r){ var s = saleFor(x, r); if(s && !sale && x.rounds.indexOf(r) > -1){ sale = s; saleRound = r; } });
+    var h = '<div class="card show'+(sale && !ended ? ' hot' : '')+(ended ? ' done' : '')+'"><div class="t"><b>'+esc(x.name)+'</b><span>'+esc(x.dates)+' · '+esc(x.city)+(x.source ? ' · 信源：'+esc(x.source) : '')+'</span></div>';
+    if(sale && !ended) h += '<div class="note hot"><b>'+saleRound+'已确定：'+esc(fmtSale(sale))+' 开抢</b><span>已写入日历，提前 1 天、1 小时、10 分钟提醒</span></div>';
+    if(!k && !ended) h += '<div class="note amber" style="font-size:12px">原型阶段这一场还没有接入监控。建议同时在购票 app 里开启开售提醒。</div>';
+    if(!ended) h += roundCells(x, false);
+    h += '<div class="foot"><span>'+(ended ? '演出已结束' : k ? '每 2 小时检查一次（9:00–23:00）' : '未接入监控')+'</span><button data-del="'+i+'">移除</button></div></div>';
+    return h;
+  }
+  function home(){
+    var t = today(), live = [], past = [];
+    mine.forEach(function(x, i){ (x.date < t ? past : live).push(showCard(x, i, x.date < t)); });
+    var h = subscribed
+      ? '<div class="status ok"><b>日历已订阅 · 开票时间会自动写入</b><button id="guide">设置指引</button></div>'
+      : '<div class="status amber"><b>还没订阅日历，提醒不会生效</b><button id="to-sub">去订阅</button></div>';
+    h += '<details class="fold" id="guide-box"'+(S.guide ? ' open' : '')+' '+(subscribed ? '' : 'hidden')+'><summary>确保提醒能响</summary><div class="in"><ol>'
+      + '<li>「设置」→「日历」→「日历账户」→「获取新数据」，把已订阅的日历设为「每小时」</li>'
+      + '<li>打开「日历」app，点底部「日历」，确认订阅的日历已勾选</li>'
+      + '<li>「设置」→「日历」→「默认提醒时间」→「事件」，设一个默认提醒作为双保险</li></ol>'
+      + '<button class="btn2" id="unsub">我其实还没订阅</button></div></details>';
+    h += '<div class="listhead"><h1>我的监控</h1><span class="hint">'+live.length+' 场进行中</span></div>';
+    h += live.length ? live.join('') : '<div class="empty">还没有正在监控的演出。<br>点下方「添加演出」，填演出名称、城市和日期。</div>';
+    if(past.length) h += '<details class="fold"><summary>已结束的演出（'+past.length+'）</summary><div class="in">'+past.join('')+'</div></details>';
+    h += '<div class="actions"><button class="btn" id="add"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>添加演出</button></div>';
+    view.innerHTML = h;
+  }
+
+  function addToMine(x){
+    if(!mine.some(function(m){return m.key === x.key})){ x.addedAt = new Date().toISOString(); mine.push(x); save('kp.mine', mine); }
+  }
+  function markSubscribed(){ subscribed = true; save('kp.subscribed', true); save('kp.tapped', false); }
   function copy(id){
     var el = document.getElementById(id); if(!el) return;
-    var done = function(){ toast('已复制'); };
-    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(el.value).then(done, function(){ el.select(); toast('已选中，长按拷贝'); }); }
-    else { el.select(); try{ document.execCommand('copy'); done(); }catch(e){ toast('已选中，长按拷贝'); } }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(el.value).then(function(){toast('已复制')}, function(){ el.select(); toast('已选中，长按拷贝'); }); }
+    else { el.select(); try{ document.execCommand('copy'); toast('已复制'); }catch(e){ toast('已选中，长按拷贝'); } }
   }
 
-  // resume: an in-app visitor who switched to Safari lands back on step 3 with the same draft
-  var fromUrl = null;
-  try{ var m = location.hash.match(/^#d=(.+)$/); if(m) fromUrl = JSON.parse(decodeURIComponent(m[1])); }catch(e){}
-  var saved = load('ec.draft', null);
-  if(fromUrl && fromUrl.name && fromUrl.date){ S.draft = fromUrl; S.step = subscribed ? 2 : 3; }
-  else if(saved && saved.draft && saved.step >= 2 && saved.step <= 3){ S.draft = saved.draft; S.step = saved.step; }
-  else if(mine.length && subscribed){ S.step = 4; }
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('button, a'); if(!t) return;
+    if(t.dataset.round){ var r = t.dataset.round, i = S.form.rounds.indexOf(r); if(i > -1) S.form.rounds.splice(i,1); else S.form.rounds.push(r);
+      S.form.rounds.sort(function(a,b){return ROUNDS.indexOf(a)-ROUNDS.indexOf(b)}); t.classList.toggle('on'); t.setAttribute('aria-pressed', i < 0); sync(); return; }
+    if(t.dataset.copy){ copy(t.dataset.copy); return; }
+    if(t.dataset.del){
+      if(t.dataset.sure){ mine.splice(+t.dataset.del, 1); save('kp.mine', mine); render(); }
+      else { t.dataset.sure = '1'; t.textContent = '确认移除？'; setTimeout(function(){ if(t.isConnected){ delete t.dataset.sure; t.textContent = '移除'; } }, 3000); }
+      return; }
+    switch(t.id){
+      case 'next1': if(ready1()){ S.form.name = S.form.name.trim(); S.draft = recognise(S.form); go(2); } break;
+      case 'back1': go(1); break;
+      case 'to-home': go(4); break;
+      case 'confirm': addToMine(S.draft); S.form = {name:'', city:'', date:'', rounds: ROUNDS.slice()}; S.fromHome = false; go(subscribed ? 4 : 3); break;
+      case 'sub': save('kp.tapped', true); break;   // prototype stand-in: the real version sees the phone fetch the personal calendar URL
+      case 'manual-done': markSubscribed(); go(4); break;
+      case 'skip': go(4); break;
+      case 'add': S.draft = null; go(1); break;
+      case 'to-sub': S.fromHome = true; go(3); break;
+      case 'guide': S.guide = !S.guide; render(); break;
+      case 'unsub': subscribed = false; save('kp.subscribed', false); S.guide = false; render(); break;
+    }
+  });
+  function sync(){ var b = $('#next1'); if(b) b.disabled = !ready1(); }
+  document.addEventListener('input', function(e){
+    var t = e.target;
+    if(t.id === 'name'){ S.form.name = t.value; sync(); }
+    if(t.id === 'city'){ S.form.city = t.value; sync(); }
+    if(t.id === 'date'){ S.form.date = t.value; sync(); }
+  });
+  // Coming back from Calendar after tapping subscribe: treat as subscribed (prototype approximation).
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible' && load('kp.tapped', false)){ markSubscribed(); S.step = 4; render(); scrollTo(0,0); }
+  });
+
+  // A show carried over from an in-app browser (WeChat / 小红书 don't share storage with Safari).
+  try{ var m = location.hash.match(/^#add=(.+)$/); if(m){ var x = JSON.parse(decodeURIComponent(m[1]));
+    if(x && x.key && x.name && x.date && x.rounds){ addToMine(x); S.draft = x; S.step = subscribed ? 4 : 3; }
+    history.replaceState(null, '', location.pathname); } }catch(e){}
+  if(load('kp.tapped', false)){ markSubscribed(); }
+  if(S.step === 1 && mine.length) S.step = 4;
   render();
+  fetch('events.json', {cache:'no-store'}).then(function(r){return r.json()}).then(function(d){ events = (d && d.events) || []; if(S.step !== 1) render(); }).catch(function(){});
 })();
 </script>
 </body>
