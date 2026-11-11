@@ -36,6 +36,15 @@ def fold(line):
     return "\r\n ".join(out)
 
 
+def dur(mins):
+    d, rem = divmod(mins, 1440)
+    h, m = divmod(rem, 60)
+    out = "-P" + (f"{d}D" if d else "")
+    if h or m or not d:
+        out += "T" + (f"{h}H" if h else "") + (f"{m}M" if m else "")
+    return out
+
+
 def alarm(trigger, text):
     return ["BEGIN:VALARM", "ACTION:DISPLAY", f"DESCRIPTION:{esc(text)}",
             (f"TRIGGER{trigger}" if trigger.startswith(";") else f"TRIGGER:{trigger}"), "END:VALARM"]
@@ -77,10 +86,13 @@ def build(data):
             lines.append(f"DESCRIPTION:{esc(desc)}")
         if kind == "sale":
             t = ev["title"]
-            # "discovery" alerts: absolute times (Asia/Shanghai) shortly after the on-sale time was written
+            # "discovery" alerts: fire shortly after the on-sale time was written.
+            # Written as an offset before the event start (same form as the -1H alarm), not as an absolute time,
+            # so they work wherever the ordinary alarms work.
             for at in ev.get("notify_at", []):
-                utc = datetime.strptime(at, "%Y-%m-%dT%H:%M") - timedelta(hours=8)
-                lines += alarm(f";VALUE=DATE-TIME:{utc:%Y%m%dT%H%M%SZ}", f"新开票时间已确定：{t}")
+                mins = int((start - datetime.strptime(at, "%Y-%m-%dT%H:%M")).total_seconds() // 60)
+                if mins > 10:
+                    lines += alarm(dur(mins), f"新开票时间已确定：{t}，{start:%m月%d日 %H:%M}开抢")
             lines += alarm("-P1D", f"明天开票：{t}")
             lines += alarm("-PT1H", f"1小时后开票：{t}")
             lines += alarm("-PT10M", f"10分钟后开抢：{t}")
