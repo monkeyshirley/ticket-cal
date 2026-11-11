@@ -38,7 +38,7 @@ def fold(line):
 
 def alarm(trigger, text):
     return ["BEGIN:VALARM", "ACTION:DISPLAY", f"DESCRIPTION:{esc(text)}",
-            f"TRIGGER:{trigger}", "END:VALARM"]
+            (f"TRIGGER{trigger}" if trigger.startswith(";") else f"TRIGGER:{trigger}"), "END:VALARM"]
 
 
 def build(data):
@@ -77,6 +77,10 @@ def build(data):
             lines.append(f"DESCRIPTION:{esc(desc)}")
         if kind == "sale":
             t = ev["title"]
+            # "discovery" alerts: absolute times (Asia/Shanghai) shortly after the on-sale time was written
+            for at in ev.get("notify_at", []):
+                utc = datetime.strptime(at, "%Y-%m-%dT%H:%M") - timedelta(hours=8)
+                lines += alarm(f";VALUE=DATE-TIME:{utc:%Y%m%dT%H%M%SZ}", f"新开票时间已确定：{t}")
             lines += alarm("-P1D", f"明天开票：{t}")
             lines += alarm("-PT1H", f"1小时后开票：{t}")
             lines += alarm("-PT10M", f"10分钟后开抢：{t}")
