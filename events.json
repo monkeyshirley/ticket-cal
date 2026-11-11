@@ -1,25 +1,4 @@
 {
   "calendar_name": "演出开票提醒",
-  "events": [
-    {
-      "id": "cq-strawberry-2026-window",
-      "show": "2026重庆草莓音乐节",
-      "type": "window",
-      "title": "【预计二开窗口】2026重庆草莓音乐节",
-      "start_date": "2026-11-17",
-      "end_date": "2026-11-26",
-      "description": "估算依据：首开 11.3 13:00，同类演出二开多在首开后 1–2 周、演出前 1–2 周。这是预计区间，不是官方时间；公告出来后会换成确切的开抢时间。关注信源：正在现场、摩登天空、草莓音乐节。",
-      "url": "https://weibo.com/2/detail/5358619566802402"
-    },
-    {
-      "id": "cq-strawberry-2026-show",
-      "show": "2026重庆草莓音乐节",
-      "type": "show",
-      "title": "🎸 2026重庆草莓音乐节（演出日）",
-      "start_date": "2026-11-28",
-      "end_date": "2026-11-29",
-      "location": "重庆国际博览中心北室外展场（两江新区）",
-      "description": "DAY1 11.28 摇滚民谣场 / DAY2 11.29 港乐与华语流行场"
-    }
-  ]
+  "events": []
 }

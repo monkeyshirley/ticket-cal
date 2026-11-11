@@ -294,13 +294,11 @@ footer{font-size:12px;color:var(--muted);padding:8px 0 calc(110px + env(safe-are
       + '<div class="perf"></div><dl class="stub">'
       + '<dt>当前状态</dt><dd class="txt"><span class="badge">'+esc(x.status)+'</span></dd>'
       + '<dt>首开</dt><dd>'+(x.firstSale ? md(x.firstSale)+' '+hm(x.firstSale) : '<span class="txt">未知</span>')+'</dd>'
-      + '<dt>预计二开</dt><dd>'+(w ? fmtD(w.from)+' – '+fmtD(w.to) : '<span class="txt">待公告</span>')+'</dd>'
+      + '<dt>预计二开<br><small style="font-size:11px">仅供参考，不进日历</small></dt><dd>'+(w ? fmtD(w.from)+' – '+fmtD(w.to) : '<span class="txt">待公告</span>')+'</dd>'
       + '<dt>提醒类型</dt><dd class="txt">'+esc(x.kinds.join(' · '))+'</dd>'
       + '</dl></div>'
       + '<div class="sectitle">会出现在你日历里的</div><div class="cal">'
-      + (w ? '<div class="e"><div class="when">'+dot(w.from)+'<br>起</div><div><b>预计二开窗口</b><span>全天显示，不响铃。估算值，公告后替换。</span></div></div>' : '')
-      + '<div class="e key"><div class="when">确定后<br>自动出现</div><div><b>'+esc(x.kinds[0])+'开抢时间</b><span>后台发现确切时间后写入</span><div class="bells"><i>提前 1 天</i><i>提前 1 小时</i><i>提前 10 分钟</i></div></div></div>'
-      + '<div class="e"><div class="when">'+dot(d(x.date))+'<br>'+wd(x.date)+'</div><div><b>演出日</b><span>'+esc(x.sessionLabel)+'</span></div></div>'
+      + '<div class="e key"><div class="when">确定后<br>才写入</div><div><b>'+esc(x.kinds[0])+'开抢时间</b><span>后台核实到确切的开抢日期和时刻后才写入，预计和传闻不会进日历。</span><div class="bells"><i>提前 1 天</i><i>提前 1 小时</i><i>提前 10 分钟</i></div></div></div>'
       + '</div>'
       + (x.source === '手动' ? '<p class="hint">这一场不在库里，提交后我们会先核实场次信息，再开始监控。</p>' : '');
     view.innerHTML = h;
@@ -346,7 +344,7 @@ footer{font-size:12px;color:var(--muted);padding:8px 0 calc(110px + env(safe-are
 
   function doneView(){
     setProgress(0);
-    var h = '<div class="done"><div class="mark">✓</div><h1>已加入你的日历</h1><p class="lead" style="margin-top:6px">开抢时间一确定，日历会自动出现事件，并提前 1 天、1 小时、10 分钟提醒你。</p></div>'
+    var h = '<div class="done"><div class="mark">✓</div><h1>已加入你的日历</h1><p class="lead" style="margin-top:6px">现在日历里是空的，这是正常的。开抢时间一确定，日历才会出现事件，并提前 1 天、1 小时、10 分钟提醒你。</p></div>'
       + '<div class="sectitle">我的场次</div>' + mineList()
       + '<details><summary>日历里没看到？</summary><ol><li>打开「日历」app，点底部「日历」，确认「演出开票提醒」已勾选</li><li>订阅日历一般每小时刷新一次，刚添加的场次可能要等一会儿</li></ol></details>';
     view.innerHTML = h;
